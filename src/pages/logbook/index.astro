@@ -1,0 +1,66 @@
+---
+import { getCollection } from "astro:content";
+
+const entries = (await getCollection("logbook"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const fmt = (d) => new Date(d).toISOString().slice(0, 10);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Logbook • Built by Jesus</title>
+  </head>
+  <body style="font-family: system-ui, Segoe UI, Arial, sans-serif; padding: 24px; max-width: 920px; margin: 0 auto;">
+    <header style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
+      <h1 style="margin:0;">Logbook</h1>
+      <a href="/" style="text-decoration:none;">← Home</a>
+    </header>
+
+    <p style="opacity:.8;">
+      Facts-first timeline. Optional neuron-stretch. Maximum receipts.
+    </p>
+
+    {entries.length === 0 ? (
+      <p><em>No entries yet. The system is awake, just underfed.</em></p>
+    ) : (
+      <ul style="list-style:none; padding:0; display:grid; gap:14px; margin-top:16px;">
+        {entries.map((e) => (
+          <li style="border:1px solid rgba(0,0,0,.15); border-radius:12px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <strong>{e.data.title}</strong>
+              <span style="opacity:.75;">
+                {fmt(e.data.date)} • {String(e.data.type).toUpperCase()} • {String(e.data.status)}
+              </span>
+            </div>
+
+            {e.data.projects?.length ? (
+              <p style="margin:8px 0 0; opacity:.75;">
+                Projects: {e.data.projects.join(", ")}
+              </p>
+            ) : null}
+
+            {e.data.facts?.length ? (
+              <ul style="margin:10px 0 0; padding-left:18px;">
+                {e.data.facts.map((f) => <li>{f}</li>)}
+              </ul>
+            ) : null}
+
+            {e.data.neuron_stretch ? (
+              <p style="margin:10px 0 0; opacity:.8;">
+                <em>{e.data.neuron_stretch}</em>
+              </p>
+            ) : null}
+
+            <p style="margin:10px 0 0;">
+              <a href={`/logbook/${e.slug}`} style="text-decoration:none;">Open entry →</a>
+            </p>
+          </li>
+        ))}
+      </ul>
+    )}
+  </body>
+</html>
