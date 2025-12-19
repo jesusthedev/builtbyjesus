@@ -1,0 +1,10 @@
+{
+  "slug": "cyber-bar",
+  "title": "Cyber Bar",
+  "type": "labs",
+  "status": "WIP",
+  "tagline": "Neon procedural experiments: SDF, bloom, shaders, and GPU fizz.",
+  "tags": ["threejs", "shaders", "visuals", "cyber"],
+  "updated": "2025-12-19",
+  "links": { "repo": "", "demo": "" }
+}
