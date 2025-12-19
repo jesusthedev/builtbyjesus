@@ -1,0 +1,26 @@
+---
+const { title = "Built by Jesus" } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body style="font-family: system-ui, Segoe UI, Arial, sans-serif; margin:0;">
+    <nav style="padding:16px 24px; border-bottom:1px solid #ddd; display:flex; gap:14px;">
+      <a href="/">Home</a>
+      <a href="/logbook">Logbook</a>
+      <a href="/work">Work</a>
+      <a href="/labs">Labs</a>
+      <a href="/updates">Updates</a>
+      <a href="/about">About</a>
+      <a href="/archive">Archive</a>
+    </nav>
+
+    <main style="padding:24px; max-width:960px; margin:0 auto;">
+      <slot />
+    </main>
+  </body>
+</html>
