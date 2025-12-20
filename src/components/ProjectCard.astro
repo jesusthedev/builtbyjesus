@@ -29,4 +29,10 @@ const statusTone =
       Tags: {project.tags.join(", ")}
     </p>
   ) : null}
+{project.lastActivity ? (
+  <p style="margin:10px 0 0; opacity:.7; font-size:.85em;">
+    Last activity: <strong>{project.lastActivity}</strong>
+  </p>
+) : null}
+
 </article>

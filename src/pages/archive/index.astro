@@ -2,17 +2,32 @@
 import Base from "../../layouts/Base.astro";
 import { projects } from "../../lib/projects";
 import ProjectList from "../../components/ProjectList.astro";
+import { getCollection } from "astro:content";
+
+const log = await getCollection("logbook");
+
+const lastMap = {};
+for (const e of log) {
+  const d = new Date(e.data.date).toISOString().slice(0, 10);
+  for (const slug of (e.data.projects || [])) {
+    if (!lastMap[slug] || d > lastMap[slug]) lastMap[slug] = d;
+  }
+}
+
+const decorate = (p) => ({ ...p, lastActivity: lastMap[p.slug] || p.updated || "" });
 
 const archived = projects
   .filter(p => p.type === "archive" || p.status === "ARCHIVED")
-  .sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
+  .sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")))
+  .map(decorate);
 
 const paused = projects
   .filter(p => p.status === "PAUSED")
-  .sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
+  .sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")))
+  .map(decorate);
 ---
 
-<Base title="Archive">
+<Base title="Archive" description="Retired and paused work, preserved with receipts.">
   <h1>Archive</h1>
   <p style="opacity:.8;">
     Retired and paused work. Preserved with receipts so future-me can’t pretend it never happened.

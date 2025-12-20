@@ -2,11 +2,25 @@
 import Base from "../../layouts/Base.astro";
 import { projects } from "../../lib/projects";
 import ProjectList from "../../components/ProjectList.astro";
+import { getCollection } from "astro:content";
 
-const work = projects.filter(p => p.type === "work");
+const log = await getCollection("logbook");
+
+// Build a map: projectSlug -> latest YYYY-MM-DD
+const lastMap = {};
+for (const e of log) {
+  const d = new Date(e.data.date).toISOString().slice(0, 10);
+  for (const slug of (e.data.projects || [])) {
+    if (!lastMap[slug] || d > lastMap[slug]) lastMap[slug] = d;
+  }
+}
+
+const work = projects
+  .filter(p => p.type === "work")
+  .map(p => ({ ...p, lastActivity: lastMap[p.slug] || p.updated || "" }));
 ---
 
-<Base title="Work">
+<Base title="Work" description="Shipped and presentable builds.">
   <h1>Work</h1>
   <p style="opacity:.8;">Shipped and presentable builds.</p>
   <ProjectList title="Work projects" items={work} />
