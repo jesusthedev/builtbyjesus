@@ -1,0 +1,51 @@
+---
+import Base from "../../layouts/Base.astro";
+import { projects } from "../../lib/projects";
+
+export async function getStaticPaths() {
+  return projects.map((p) => ({ params: { slug: p.slug }, props: { project: p } }));
+}
+
+const { project } = Astro.props;
+
+const statusLabel = String(project.status || "WIP");
+---
+
+<Base title={`${project.title} • Built by Jesus`}>
+  <p style="opacity:.75; margin:0 0 10px;">
+    <a href={project.type === "labs" ? "/labs" : "/work"} style="text-decoration:none;">
+      ← Back to {project.type === "labs" ? "Labs" : "Work"}
+    </a>
+  </p>
+
+  <h1 style="margin:0 0 8px;">{project.title}</h1>
+  <p style="opacity:.8; margin:0 0 14px;">
+    <strong>Status:</strong> {statusLabel}
+  </p>
+
+  {project.tagline && <p style="opacity:.9; max-width:70ch;">{project.tagline}</p>}
+
+  {project.tags?.length ? (
+    <>
+      <h2>Tags</h2>
+      <ul>
+        {project.tags.map((t) => <li>{t}</li>)}
+      </ul>
+    </>
+  ) : null}
+
+  {project.links && (project.links.repo || project.links.demo) ? (
+    <>
+      <h2>Links</h2>
+      <ul>
+        {project.links.repo ? <li><a href={project.links.repo}>Repo</a></li> : null}
+        {project.links.demo ? <li><a href={project.links.demo}>Live demo</a></li> : null}
+      </ul>
+    </>
+  ) : null}
+
+  <hr style="margin:18px 0; opacity:.3;" />
+  <p style="opacity:.75;">
+    Next upgrade: pull per-project STATUS and LOGBOOK into this page automatically.
+  </p>
+</Base>

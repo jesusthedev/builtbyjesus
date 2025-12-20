@@ -1,10 +1,32 @@
 ---
 const { project } = Astro.props;
+
+const statusLabel = String(project.status || "WIP");
+const statusTone =
+  statusLabel === "LIVE" ? "background:#e7f7ee;border-color:#a9e5c1;color:#0f5132;" :
+  statusLabel === "PAUSED" ? "background:#fff4e5;border-color:#ffd39a;color:#7a4a00;" :
+  statusLabel === "ARCHIVED" ? "background:#f2f2f2;border-color:#d6d6d6;color:#444;" :
+  "background:#eef3ff;border-color:#c9d7ff;color:#1f3b8a;"; // WIP default
 ---
+
 <article style="border:1px solid #ddd; border-radius:12px; padding:14px;">
-  <h2 style="margin:0 0 6px;">{project.title}</h2>
-  {project.tagline && <p style="opacity:.8;">{project.tagline}</p>}
-  <p style="font-size:.85em; opacity:.7;">
-    Status: <strong>{project.status}</strong>
-  </p>
+  <div style="display:flex; justify-content:space-between; gap:10px; align-items:baseline; flex-wrap:wrap;">
+    <h2 style="margin:0;">
+      <a href={`/p/${project.slug}`} style="text-decoration:none; color:inherit;">
+        {project.title}
+      </a>
+    </h2>
+
+    <span style={`font-size:.78em; padding:4px 8px; border-radius:999px; border:1px solid; ${statusTone}`}>
+      {statusLabel}
+    </span>
+  </div>
+
+  {project.tagline && <p style="opacity:.8; margin:8px 0 0;">{project.tagline}</p>}
+
+  {project.tags?.length ? (
+    <p style="margin:10px 0 0; opacity:.75; font-size:.85em;">
+      Tags: {project.tags.join(", ")}
+    </p>
+  ) : null}
 </article>
