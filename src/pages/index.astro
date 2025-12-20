@@ -1,5 +1,12 @@
 ---
 import Base from "../layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const entries = (await getCollection("logbook"))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const fmt = (d) => new Date(d).toISOString().slice(0, 10);
 ---
 
 <Base title="Built by Jesus">
@@ -8,7 +15,38 @@ import Base from "../layouts/Base.astro";
     Systems, stories, and experiments. Documented. Versioned. Remembered.
   </p>
 
-  <p>
-    Start with the <a href="/logbook">Logbook</a>. That’s where the truth lives.
+  <hr style="margin:24px 0; opacity:.3;" />
+
+  <h2>Latest activity</h2>
+
+  {entries.length === 0 ? (
+    <p style="opacity:.75;"><em>No logbook entries yet.</em></p>
+  ) : (
+    <ul style="list-style:none; padding:0; display:grid; gap:12px;">
+      {entries.map((e) => (
+        <li style="border:1px solid #ddd; border-radius:10px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <strong>
+              <a href={`/logbook/${e.slug}`} style="text-decoration:none; color:inherit;">
+                {e.data.title}
+              </a>
+            </strong>
+            <span style="opacity:.7;">
+              {fmt(e.data.date)} • {String(e.data.type).toUpperCase()}
+            </span>
+          </div>
+
+          {e.data.facts?.length ? (
+            <ul style="margin:8px 0 0; padding-left:18px;">
+              {e.data.facts.slice(0, 2).map((f) => <li>{f}</li>)}
+            </ul>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  )}
+
+  <p style="margin-top:14px;">
+    <a href="/logbook">View full logbook →</a>
   </p>
 </Base>
