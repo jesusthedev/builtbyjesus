@@ -1,7 +1,38 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { projects } from "../../lib/projects";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+const archived = projects
+  .filter(p => p.type === "archive" || p.status === "ARCHIVED")
+  .sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
+
+const paused = projects
+  .filter(p => p.status === "PAUSED")
+  .sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
 ---
+
 <Base title="Archive">
   <h1>Archive</h1>
-  <p>Paused and retired work. Preserved with receipts.</p>
+  <p style="opacity:.8;">
+    Retired and paused work. Preserved with receipts so future-me can’t pretend it never happened.
+  </p>
+
+  <h2 style="margin-top:24px;">Paused</h2>
+  {paused.length === 0 ? (
+    <p style="opacity:.75;"><em>No paused projects.</em></p>
+  ) : (
+    <div style="display:grid; gap:14px;">
+      {paused.map(p => <ProjectCard project={p} />)}
+    </div>
+  )}
+
+  <h2 style="margin-top:24px;">Archived</h2>
+  {archived.length === 0 ? (
+    <p style="opacity:.75;"><em>No archived projects yet.</em></p>
+  ) : (
+    <div style="display:grid; gap:14px;">
+      {archived.map(p => <ProjectCard project={p} />)}
+    </div>
+  )}
 </Base>

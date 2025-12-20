@@ -1,0 +1,10 @@
+{
+  "slug": "odyssey",
+  "title": "Odyssey (Prototype)",
+  "type": "archive",
+  "status": "ARCHIVED",
+  "tagline": "Early origin concept that taught the system what it wanted to become.",
+  "tags": ["prototype", "origin"],
+  "updated": "2025-12-19",
+  "links": { "repo": "", "demo": "" }
+}
