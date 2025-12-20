@@ -1,7 +1,18 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { projects } from "../../lib/projects";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+const labs = projects.filter(p => p.type === "labs");
 ---
+
 <Base title="Labs">
   <h1>Labs</h1>
-  <p>Experiments. Some graduate. Some don’t.</p>
+  {labs.length === 0 ? (
+    <p>No labs registered yet.</p>
+  ) : (
+    <div style="display:grid; gap:14px;">
+      {labs.map(p => <ProjectCard project={p} />)}
+    </div>
+  )}
 </Base>

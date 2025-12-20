@@ -1,0 +1,10 @@
+---
+const { project } = Astro.props;
+---
+<article style="border:1px solid #ddd; border-radius:12px; padding:14px;">
+  <h2 style="margin:0 0 6px;">{project.title}</h2>
+  {project.tagline && <p style="opacity:.8;">{project.tagline}</p>}
+  <p style="font-size:.85em; opacity:.7;">
+    Status: <strong>{project.status}</strong>
+  </p>
+</article>
