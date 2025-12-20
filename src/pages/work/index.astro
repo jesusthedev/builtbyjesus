@@ -1,18 +1,13 @@
 ---
 import Base from "../../layouts/Base.astro";
 import { projects } from "../../lib/projects";
-import ProjectCard from "../../components/ProjectCard.astro";
+import ProjectList from "../../components/ProjectList.astro";
 
 const work = projects.filter(p => p.type === "work");
 ---
 
 <Base title="Work">
   <h1>Work</h1>
-  {work.length === 0 ? (
-    <p>No work registered yet.</p>
-  ) : (
-    <div style="display:grid; gap:14px;">
-      {work.map(p => <ProjectCard project={p} />)}
-    </div>
-  )}
+  <p style="opacity:.8;">Shipped and presentable builds.</p>
+  <ProjectList title="Work projects" items={work} />
 </Base>

@@ -1,0 +1,133 @@
+---
+import ProjectCard from "./ProjectCard.astro";
+
+const { title = "Projects", items = [] } = Astro.props;
+
+const statuses = ["ALL", "WIP", "LIVE", "PAUSED", "ARCHIVED"];
+---
+
+<section>
+  <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
+    <h2 style="margin:0;">{title}</h2>
+    <div style="opacity:.75;">
+      <span data-count>Total: {items.length}</span>
+      <span data-count-live style="margin-left:10px;"></span>
+      <span data-count-wip style="margin-left:10px;"></span>
+      <span data-count-paused style="margin-left:10px;"></span>
+      <span data-count-archived style="margin-left:10px;"></span>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 10px;">
+    <input
+      id={`${title}-q`}
+      type="search"
+      placeholder="Search title, tagline, tags..."
+      style="flex:1; min-width:240px; padding:10px 12px; border:1px solid #ddd; border-radius:10px;"
+    />
+
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      {statuses.map((s) => (
+        <button
+          type="button"
+          class="filter-btn"
+          data-filter={s}
+          style="padding:8px 10px; border:1px solid #ddd; border-radius:999px; background:#fff; cursor:pointer;"
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  <div id={`${title}-empty`} style="display:none; opacity:.75; margin-top:12px;">
+    <em>No projects match your search/filter.</em>
+  </div>
+
+  <div id={`${title}-grid`} style="display:grid; gap:14px;">
+    {items.map((p) => (
+      <div
+        class="project-item"
+        data-title={(p.title || "").toLowerCase()}
+        data-tagline={(p.tagline || "").toLowerCase()}
+        data-tags={((p.tags || []).join(" ") || "").toLowerCase()}
+        data-status={String(p.status || "WIP").toUpperCase()}
+      >
+        <ProjectCard project={p} />
+      </div>
+    ))}
+  </div>
+
+  <script>
+    (() => {
+      const root = document.currentScript?.closest("section");
+      if (!root) return;
+
+      const q = root.querySelector('input[type="search"]');
+      const buttons = [...root.querySelectorAll(".filter-btn")];
+      const items = [...root.querySelectorAll(".project-item")];
+      const empty = root.querySelector('[id$="-empty"]');
+
+      const elTotal = root.querySelector("[data-count]");
+      const elLive = root.querySelector("[data-count-live]");
+      const elWip = root.querySelector("[data-count-wip]");
+      const elPaused = root.querySelector("[data-count-paused]");
+      const elArchived = root.querySelector("[data-count-archived]");
+
+      const counts = (arr) => {
+        const c = { LIVE: 0, WIP: 0, PAUSED: 0, ARCHIVED: 0 };
+        for (const it of arr) {
+          const s = it.dataset.status || "WIP";
+          if (c[s] !== undefined) c[s]++;
+        }
+        return c;
+      };
+
+      const renderCounts = (arr) => {
+        const c = counts(arr);
+        if (elTotal) elTotal.textContent = `Total: ${arr.length}`;
+        if (elLive) elLive.textContent = c.LIVE ? `LIVE: ${c.LIVE}` : "";
+        if (elWip) elWip.textContent = c.WIP ? `WIP: ${c.WIP}` : "";
+        if (elPaused) elPaused.textContent = c.PAUSED ? `PAUSED: ${c.PAUSED}` : "";
+        if (elArchived) elArchived.textContent = c.ARCHIVED ? `ARCHIVED: ${c.ARCHIVED}` : "";
+      };
+
+      let active = "ALL";
+
+      const apply = () => {
+        const term = (q?.value || "").trim().toLowerCase();
+
+        let visible = 0;
+        for (const it of items) {
+          const matchStatus = active === "ALL" || (it.dataset.status === active);
+          const hay = `${it.dataset.title} ${it.dataset.tagline} ${it.dataset.tags}`;
+          const matchText = !term || hay.includes(term);
+
+          const show = matchStatus && matchText;
+          it.style.display = show ? "" : "none";
+          if (show) visible++;
+        }
+
+        if (empty) empty.style.display = visible ? "none" : "";
+        renderCounts(items.filter(it => it.style.display !== "none"));
+      };
+
+      const setActive = (val) => {
+        active = val;
+        for (const b of buttons) {
+          const on = b.dataset.filter === active;
+          b.style.background = on ? "#111" : "#fff";
+          b.style.color = on ? "#fff" : "#000";
+          b.style.borderColor = on ? "#111" : "#ddd";
+        }
+        apply();
+      };
+
+      q?.addEventListener("input", apply);
+      for (const b of buttons) b.addEventListener("click", () => setActive(b.dataset.filter));
+
+      // init
+      setActive("ALL");
+    })();
+  </script>
+</section>
