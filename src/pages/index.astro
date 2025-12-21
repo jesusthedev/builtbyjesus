@@ -1,12 +1,26 @@
 ---
 import Base from "../layouts/Base.astro";
 import { getCollection } from "astro:content";
+import { projects } from "../lib/projects";
 
 const entries = (await getCollection("logbook"))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
 const fmt = (d) => new Date(d).toISOString().slice(0, 10);
+
+// Now / Next / Later
+const now = projects
+  .filter((p) => ["LIVE", "WIP"].includes(String(p.status)))
+  .slice(0, 3);
+
+const next = projects
+  .filter((p) => String(p.status) === "WIP")
+  .slice(0, 3);
+
+const later = projects
+  .filter((p) => ["PAUSED", "ARCHIVED"].includes(String(p.status)))
+  .slice(0, 3);
 ---
 
 <Base title="Built by Jesus">
@@ -14,6 +28,57 @@ const fmt = (d) => new Date(d).toISOString().slice(0, 10);
   <p>
     Systems, stories, and experiments. Documented. Versioned. Remembered.
   </p>
+
+  <hr style="margin:24px 0; opacity:.3;" />
+
+  <h2>Now / Next / Later</h2>
+
+  <div style="display:grid; gap:14px; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));">
+    <section style="border:1px solid #ddd; border-radius:12px; padding:14px;">
+      <h3 style="margin:0 0 10px;">Now</h3>
+      {now.length ? (
+        <ul style="margin:0; padding-left:18px;">
+          {now.map((p) => (
+            <li>
+              <a href={`/p/${p.slug}`}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p style="opacity:.75; margin:0;"><em>Nothing active.</em></p>
+      )}
+    </section>
+
+    <section style="border:1px solid #ddd; border-radius:12px; padding:14px;">
+      <h3 style="margin:0 0 10px;">Next</h3>
+      {next.length ? (
+        <ul style="margin:0; padding-left:18px;">
+          {next.map((p) => (
+            <li>
+              <a href={`/p/${p.slug}`}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p style="opacity:.75; margin:0;"><em>Queue is empty.</em></p>
+      )}
+    </section>
+
+    <section style="border:1px solid #ddd; border-radius:12px; padding:14px;">
+      <h3 style="margin:0 0 10px;">Later</h3>
+      {later.length ? (
+        <ul style="margin:0; padding-left:18px;">
+          {later.map((p) => (
+            <li>
+              <a href={`/p/${p.slug}`}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p style="opacity:.75; margin:0;"><em>No backlog.</em></p>
+      )}
+    </section>
+  </div>
 
   <hr style="margin:24px 0; opacity:.3;" />
 
