@@ -1,10 +1,26 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { getTotalMinutes, formatDuration } from "../../lib/timeTotals";
+
+const totalMinutes = await getTotalMinutes();
+const totalTime = formatDuration(totalMinutes);
 ---
+
 <Base title="About">
   <h1>About</h1>
-  <p>How this system is built and why.</p>
+
+  <p>
+    This site is a living system. Projects, decisions, failures, progress.
+    All documented. All remembered.
+  </p>
+
+  <hr style="margin:20px 0; opacity:.3;" />
+
+  <p style="opacity:.8;">
+    <strong>Total time invested:</strong> {totalTime}
+  </p>
+
+  <p style="opacity:.7;">
+    Computed automatically from session summaries. No guesswork. No vibes.
+  </p>
 </Base>
-<p style="opacity:.7;">
-  Latest truth lives in the <a href="/logbook">Logbook</a>.
-</p>
