@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import { projects } from "../../lib/projects";
 import { getCollection } from "astro:content";
+import { getMinutesByProject, formatDuration as fmtDur } from "../../lib/timeByProject";
 
 // Static paths
 export async function getStaticPaths() {
@@ -16,12 +17,17 @@ const { project } = Astro.props;
 const statusLabel = String(project.status || "WIP");
 const fmt = (d) => new Date(d).toISOString().slice(0, 10);
 
-// Pull global logbook entries
+// Pull global logbook entries for this project
 const entriesAll = await getCollection("logbook");
 const entries = entriesAll
   .filter((e) => (e.data.projects || []).includes(project.slug))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 5);
+
+// Per-project time totals (from session summaries)
+const minutesByProject = await getMinutesByProject();
+const investedMinutes = minutesByProject[project.slug] || 0;
+const invested = fmtDur(investedMinutes);
 
 // Attempt to load STATUS.md and NOTES.md
 let StatusContent = null;
@@ -46,8 +52,13 @@ try {
   </p>
 
   <h1 style="margin:0 0 6px;">{project.title}</h1>
-  <p style="opacity:.8; margin:0 0 14px;">
+
+  <p style="opacity:.8; margin:0 0 10px;">
     <strong>Status:</strong> {statusLabel}
+  </p>
+
+  <p style="opacity:.8; margin:0 0 14px;">
+    <strong>Time invested:</strong> {invested}
   </p>
 
   {project.tagline && (
