@@ -1,12 +1,19 @@
 ---
+import { getTotalMinutes, formatDuration } from "../lib/timeTotals";
+
 const {
   title = "Built by Jesus",
   description = "Systems, stories, and experiments. Documented. Versioned. Remembered.",
-  image = "/nasa.jpg"
+  image = "/og.png"
 } = Astro.props;
 
+// Canonical + OG URLs
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).toString();
 const ogImage = new URL(image, Astro.site ?? Astro.url.origin).toString();
+
+// Running total time for the signature stamp
+const totalMinutes = await getTotalMinutes();
+const totalTime = formatDuration(totalMinutes);
 ---
 
 <!doctype html>
@@ -47,86 +54,104 @@ const ogImage = new URL(image, Astro.site ?? Astro.url.origin).toString();
     <main style="padding:24px; max-width:960px; margin:0 auto;">
       <slot />
     </main>
-<footer style="padding:22px 24px; border-top:1px solid #ddd; margin-top:28px;">
-  <div style="max-width:960px; margin:0 auto; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
-    <span style="opacity:.75;">© {new Date().getFullYear()} builtbyjesus.dev</span>
 
-    <button
-      id="sig"
-      type="button"
-      title="(totally normal footer)"
-      style="opacity:.65; background:none; border:1px solid transparent; border-radius:10px; cursor:pointer; padding:6px 10px;"
-    >
-      built with care
-    </button>
-  </div>
+    <footer style="padding:22px 24px; border-top:1px solid #ddd; margin-top:28px;">
+      <div style="max-width:960px; margin:0 auto; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+        <span style="opacity:.75;">© {new Date().getFullYear()} builtbyjesus.dev</span>
 
-  <div
-    id="sigPanel"
-    style="display:none; max-width:960px; margin:12px auto 0; border:1px dashed #bbb; border-radius:12px; padding:14px 16px; opacity:.92;"
-  >
-    <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
-      <strong>Built by Chuy · Remembered by Igorithm</strong>
-      <span style="opacity:.7; font-size:.9em;">secret handshake unlocked</span>
-    </div>
+        <button
+          id="sig"
+          type="button"
+          title="(totally normal footer)"
+          style="opacity:.65; background:none; border:1px solid transparent; border-radius:10px; cursor:pointer; padding:6px 10px;"
+        >
+          built with care
+        </button>
+      </div>
 
-    <div style="margin-top:10px;">
-      <p style="margin:0 0 10px; opacity:.85;">
-        <strong>Igorithm (Mr. Miyagi Edition):</strong> wax on, wax off, <em>commit</em>.
-      </p>
+      <div
+        id="sigPanel"
+        style="display:none; max-width:960px; margin:12px auto 0; border:1px dashed #bbb; border-radius:12px; padding:14px 16px; opacity:.92;"
+      >
+        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
+          <strong>Built by Chuy · Remembered by Igorithm</strong>
+          <span style="opacity:.7; font-size:.9em;">secret handshake unlocked</span>
+        </div>
 
-      <ul style="margin:0; padding-left:18px; display:grid; gap:6px;">
-        <li>Small changes. Clean commits. No heroics at 2:37 a.m.</li>
-        <li>If YAML fights you, quote it. If it still fights you, replace it.</li>
-        <li>Logbook everything. Memory is a feature, not a vibe.</li>
-        <li>Ship the boring infrastructure first. Future you will bow politely.</li>
-      </ul>
+        <p style="margin:8px 0 0; opacity:.75;">
+          <strong>Hours invested:</strong> {totalTime}
+        </p>
 
-      <p style="margin:12px 0 0; opacity:.75;">
-        <em>Vault note:</em> every decision is archived. Every excuse is indexed.
-      </p>
-    </div>
-  </div>
+        <div id="sigToast" style="display:none; margin-top:10px; opacity:.8; font-size:.9em;">
+          wax on: <code>git add</code> · wax off: <code>git commit</code>
+        </div>
 
-  <script>
-    (() => {
-      const btn = document.getElementById("sig");
-      const panel = document.getElementById("sigPanel");
-      if (!btn || !panel) return;
+        <div style="margin-top:10px;">
+          <p style="margin:0 0 10px; opacity:.85;">
+            <strong>Igorithm (Mr. Miyagi Edition):</strong> wax on, wax off, <em>commit</em>.
+          </p>
 
-      let clicks = 0;
-      let clickTimer = null;
+          <ul style="margin:0; padding-left:18px; display:grid; gap:6px;">
+            <li>Small changes. Clean commits. No heroics at 2:37 a.m.</li>
+            <li>If YAML fights you, quote it. If it still fights you, replace it.</li>
+            <li>Logbook everything. Memory is a feature, not a vibe.</li>
+            <li>Ship the boring infrastructure first. Future you will bow politely.</li>
+          </ul>
 
-      const toggle = () => {
-        panel.style.display = panel.style.display === "none" ? "" : "none";
-      };
+          <p style="margin:12px 0 0; opacity:.75;">
+            <em>Vault note:</em> every decision is archived. Every excuse is indexed.
+          </p>
+        </div>
+      </div>
 
-      // Desktop ritual: triple-click within 900ms
-      btn.addEventListener("click", () => {
-        clicks++;
-        clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => (clicks = 0), 900);
+      <script>
+        (() => {
+          const btn = document.getElementById("sig");
+          const panel = document.getElementById("sigPanel");
+          const toast = document.getElementById("sigToast");
+          if (!btn || !panel) return;
 
-        if (clicks >= 3) {
-          toggle();
-          clicks = 0;
-        }
-      });
+          let clicks = 0;
+          let clickTimer = null;
 
-      // Mobile ritual: long-press ~600ms
-      let pressTimer = null;
-      const startPress = () => {
-        clearTimeout(pressTimer);
-        pressTimer = setTimeout(() => toggle(), 600);
-      };
-      const endPress = () => clearTimeout(pressTimer);
+          const toggle = () => {
+            const opening = panel.style.display === "none";
+            panel.style.display = opening ? "" : "none";
 
-      btn.addEventListener("touchstart", startPress, { passive: true });
-      btn.addEventListener("touchend", endPress, { passive: true });
-      btn.addEventListener("touchcancel", endPress, { passive: true });
-    })();
-  </script>
-</footer>
+            if (opening && toast) {
+              toast.style.display = "";
+              clearTimeout(toast._t);
+              toast._t = setTimeout(() => {
+                toast.style.display = "none";
+              }, 1200);
+            }
+          };
 
+          // Desktop ritual: triple-click within 900ms
+          btn.addEventListener("click", () => {
+            clicks++;
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => (clicks = 0), 900);
+
+            if (clicks >= 3) {
+              toggle();
+              clicks = 0;
+            }
+          });
+
+          // Mobile ritual: long-press ~600ms
+          let pressTimer = null;
+          const startPress = () => {
+            clearTimeout(pressTimer);
+            pressTimer = setTimeout(() => toggle(), 600);
+          };
+          const endPress = () => clearTimeout(pressTimer);
+
+          btn.addEventListener("touchstart", startPress, { passive: true });
+          btn.addEventListener("touchend", endPress, { passive: true });
+          btn.addEventListener("touchcancel", endPress, { passive: true });
+        })();
+      </script>
+    </footer>
   </body>
 </html>

@@ -6,13 +6,23 @@ const totalMinutes = await getTotalMinutes();
 const totalTime = formatDuration(totalMinutes);
 ---
 
-<Base title="About">
+<Base title="About" description="What this site is and how it’s built.">
   <h1>About</h1>
 
   <p>
     This site is a living system. Projects, decisions, failures, progress.
     All documented. All remembered.
   </p>
+
+  <hr style="margin:20px 0; opacity:.3;" />
+
+  <h2>Principles</h2>
+  <ul style="display:grid; gap:8px;">
+    <li><strong>Small changes:</strong> keep scope tight, ship often.</li>
+    <li><strong>Memory matters:</strong> logbook over vibes.</li>
+    <li><strong>Infrastructure first:</strong> build the rails before the ride.</li>
+    <li><strong>Less heroics:</strong> if it requires 2:37 a.m. bravery, it’s probably wrong.</li>
+  </ul>
 
   <hr style="margin:20px 0; opacity:.3;" />
 
